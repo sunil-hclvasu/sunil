@@ -1,0 +1,97 @@
+#!/bin/bash
+###################
+# Script: Gathering system details
+# Version: 1.0  - Initial
+# Author: Sunil Kamba Vasu
+###################
+
+echo ""
+echo "Gathering system details..."
+echo ""
+CPU_COUNT=`cat /proc/cpuinfo |grep "^processor"|wc -l`
+TOTAL_MEM=`free -m|grep "^Mem:"|awk {'print $2'}`
+AVAIL_MEM=`free -m|grep "^Mem:"|awk {'print $4'}`
+OS_VERSION=`cat /etc/redhat-release`
+TOTAL_DISK_BYTES=`fdisk -l|grep "^Disk /dev/sd"|awk '{ sum +=$5 } END { print sum }'`
+TOTAL_DISK_GBYTES=$((DISK_BYTES/1024/1024/1024))
+DISK_BY_PARTITION=`fdisk -l|grep "^Disk /dev/sd"|awk {'print $2, $3, $4'}`
+PARTITION_LIST=`df -hP|grep "^/dev/\|^Filesystem"|awk {'print $2, "\t" $3, "\t" $4, "\t" $5, "\t" $6, ","'}`
+IP_ADDR=`ifconfig 2>/dev/null| awk '/inet addr/{print substr($2,6)}'`
+TOTAL_PACKAGES=`rpm -qa|wc -l`
+PACKAGES=`rpm -qa`
+ps -ef > /tmp/ps.out
+
+
+clear
+echo "Displaying system details..."
+echo "Hit Enter to continue..."
+read
+echo "Number of CPU"
+echo "============="
+echo -n "Hit Enter to see output..."
+read
+echo $CPU_COUNT
+echo ""
+
+echo "Total Memory"
+echo "============"
+echo -n "Hit Enter to see output..."
+read
+echo $TOTAL_MEM
+echo ""
+
+echo "Total Available Memory"
+echo "======================"
+echo -n "Hit Enter to see output..."
+read
+echo $AVAIL_MEM
+echo ""
+
+echo "OS Name and its version"
+echo "======================="
+echo -n "Hit Enter to see output..."
+read
+echo $OS_VERSION
+echo ""
+
+echo "Disk information"
+echo "================"
+echo -n "Hit Enter to see output..."
+read
+echo "Total capacity: $TOTAL_DISK_GBYTES"
+echo $DISK_BY_PARTITION|tr ',' '\n'
+echo ""
+
+echo "Partition wise free space available"
+echo "==================================="
+echo -n "Hit Enter to see output..."
+read
+echo $PARTITION_LIST|tr ',' '\n'
+
+echo "IP Address Information"
+echo "======================"
+echo -n "Hit Enter to see output..."
+read
+echo $IP_ADDR
+echo ""
+
+echo "Total number of packages installed"
+echo "=================================="
+echo -n "Hit Enter to see output..."
+read
+echo $TOTAL_PACKAGES
+echo ""
+
+echo "List Installed package name and its version"
+echo "========================================"
+echo -n "Hit Enter to see output..."
+read
+echo $PACKAGES|tr ' ' '\n'
+echo ""
+
+echo "List the ongoing process on the machine"
+echo "======================================="
+echo -n "Hit Enter to see output..."
+read
+cat /tmp/ps.out
+rm -rf /tmp/ps.out
